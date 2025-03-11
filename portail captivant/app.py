@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session 
 import json
 from waitress import serve
 
@@ -22,10 +22,10 @@ def save_users(users):
 def home():
     if 'username' in session:
         return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))  # Redirection vers 'index' au lieu de 'login'
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/index', methods=['GET', 'POST'])  # Modification de '/login' à '/index'
+def index():  # Modification de la fonction 'login' en 'index'
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -38,19 +38,19 @@ def login():
         else:
             return "Nom d'utilisateur ou mot de passe incorrect", 403
 
-    return render_template('login.html')
+    return render_template('index.html')  # Chargement de la nouvelle page 'index.html'
 
 @app.route('/dashboard')
 def dashboard():
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))  # Redirection vers 'index' si non connecté
     username = session['username']
     return render_template('dashboard.html', username=username)
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))  # Redirection vers 'index' si non connecté
 
     if session['username'] != "yassaou":
         return "Accès interdit", 403  # Seul l'admin peut ajouter un utilisateur
