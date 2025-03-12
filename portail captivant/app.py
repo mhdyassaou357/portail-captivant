@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session  
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import json
+import os
 from waitress import serve
 
 app = Flask(__name__)
@@ -8,15 +9,15 @@ app.secret_key = 'ton_secret_key'  # Pour sécuriser les sessions
 # Charger les utilisateurs depuis un fichier JSON
 def load_users():
     try:
+        if not os.path.exists('users.json'):
+            print("Fichier users.json introuvable.")  # Debug
+            return {}
         with open('users.json', 'r', encoding='utf-8') as f:
             users = json.load(f)
             print("Utilisateurs chargés:", users)  # Debug
             return users
-    except FileNotFoundError:
-        print("Fichier users.json non trouvé")  # Debug
-        return {}
     except json.JSONDecodeError:
-        print("Erreur de lecture JSON")  # Debug
+        print("Erreur de lecture du fichier users.json")  # Debug
         return {}
 
 # Sauvegarder les utilisateurs dans un fichier JSON
@@ -48,7 +49,8 @@ def index():
             return redirect(url_for('success'))
         else:
             print("Échec de connexion: Nom d'utilisateur ou mot de passe incorrect")  # Debug
-            return "Nom d'utilisateur ou mot de passe incorrect", 403
+            flash("Nom d'utilisateur ou mot de passe incorrect", "error")
+            return redirect(url_for('index'))
 
     return render_template('index.html')
 
@@ -69,6 +71,7 @@ def dashboard():
 def logout():
     session.clear()
     print("Déconnexion réussie")  # Debug
+    flash("Vous avez été déconnecté", "info")
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
