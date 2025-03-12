@@ -43,12 +43,20 @@ def index():
         if username in users and users[username] == password:
             session['username'] = username
             print("Connexion réussie!")  # Debug
-            return redirect(url_for('dashboard'))
+            if username == "yassaou":
+                return redirect(url_for('dashboard'))
+            return redirect(url_for('success'))
         else:
             print("Échec de connexion: Nom d'utilisateur ou mot de passe incorrect")  # Debug
             return "Nom d'utilisateur ou mot de passe incorrect", 403
 
     return render_template('index.html')
+
+@app.route('/success')
+def success():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    return render_template('success.html')
 
 @app.route('/dashboard')
 def dashboard():
@@ -57,30 +65,6 @@ def dashboard():
     username = session['username']
     return render_template('dashboard.html', username=username)
 
-@app.route('/add_user', methods=['POST'])
-def add_user():
-    if 'username' not in session:
-        return redirect(url_for('index'))
-
-    if session['username'] != "yassaou":
-        return "Accès interdit", 403
-
-    new_username = request.form.get('new_username', '').strip()
-    new_password = request.form.get('new_password', '').strip()
-
-    if not new_username or not new_password:
-        return "Nom d'utilisateur ou mot de passe vide", 400
-
-    users = load_users()
-
-    if new_username in users:
-        return "L'utilisateur existe déjà", 400
-
-    users[new_username] = new_password
-    save_users(users)
-    print(f"Nouvel utilisateur ajouté: {new_username}")  # Debug
-    return redirect(url_for('dashboard'))
-
 @app.route('/logout')
 def logout():
     session.clear()
@@ -88,4 +72,4 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    serve(app, host='0.0.0.0', port=5000)
