@@ -1,0 +1,25 @@
+<!-- dashboard.html -->
+<html>
+<head>
+    <title>Tableau de bord</title>
+</head>
+<body>
+    <h2>Bienvenue {{ username }}</h2>
+
+    {% if username == "yassaou" %}
+        <h3>Administrateur</h3>
+        <form method="POST" action="/add_user">
+            <label for="new_username">Ajouter un nouvel utilisateur :</label><br>
+            <input type="text" id="new_username" name="new_username" required><br>
+            <label for="new_password">Mot de passe :</label><br>
+            <input type="password" id="new_password" name="new_password" required><br><br>
+            <button type="submit">Ajouter</button>
+        </form>
+    {% else %}
+        <h3>Utilisateur</h3>
+        <p>Bienvenue dans le portail !</p>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}">Déconnexion</a>
+</body>
+</html>
